@@ -54,20 +54,20 @@ public class ServiceAudioRecord extends Service{
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,RECORDER_CHANNELS,RECORDER_AUDIO_ENCODING);
         //getting the location info
-		lat=(String) intent.getExtras().get("Lat");
+		/*lat=(String) intent.getExtras().get("Lat");
 		lon=(String) intent.getExtras().get("Lon");
 		alt=(String) intent.getExtras().get("Alt");
 		bea=(String) intent.getExtras().get("Bea");
 		pr=(String) intent.getExtras().get("Pr");
 		sp=(String) intent.getExtras().get("Sp");
-		t=(String) intent.getExtras().get("T");// did not use it yet.
+		t=(String) intent.getExtras().get("T");// did not use it yet.*/
 		//getting the current time
         currentYMD_HMS = ""+System.currentTimeMillis();
 		
 		recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
 				RECORDER_SAMPLERATE, RECORDER_CHANNELS,RECORDER_AUDIO_ENCODING, bufferSize);
-		rHandler.removeCallbacks(recordAudio);
-		rHandler.postDelayed(recordAudio,audioLengthSecond*1000);// register again to start after 10 seconds...
+		//rHandler.removeCallbacks(recordAudio);
+		//rHandler.postDelayed(recordAudio,audioLengthSecond*1000);// register again to start after 10 seconds...
 		startRecording();
 		return super.onStartCommand(intent, flags, startId);
 	}
@@ -80,7 +80,8 @@ public class ServiceAudioRecord extends Service{
 			SensorData sd= new SensorData();
 			sd.setIsManual("false");
 			sd.setDateAndTime(currentYMD_HMS);
-			sd.setGPSData(lat, lon, alt, pr, sp, bea);
+			//sd.setGPSData(lat, lon, alt, pr, sp, bea);
+			Toast.makeText(getBaseContext(), afname, Toast.LENGTH_LONG).show();
 			sd.setAudioFileName(afname);
 			long lastRow = db.addContact(sd);
 			db.close();
@@ -176,7 +177,7 @@ public class ServiceAudioRecord extends Service{
 
 	private void stopRecording(){
 		Log.i("MainActivity", "StopAudioCapture");
-		Toast.makeText(getBaseContext(), "Stop AudioCapture", Toast.LENGTH_LONG).show();
+		Toast.makeText(getBaseContext(), "Stop AudioCapture", Toast.LENGTH_SHORT).show();
 		if(null != recorder){
 			isRecording = false;
 
@@ -288,6 +289,8 @@ public class ServiceAudioRecord extends Service{
 
 	@Override
 	public void onDestroy() {
+		rHandler.removeCallbacks(recordAudio);
+		rHandler.post(recordAudio);
 		super.onDestroy();
 	}
 

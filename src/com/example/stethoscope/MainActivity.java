@@ -1,27 +1,48 @@
 package com.example.stethoscope;
 
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
+import java.io.IOException;
+import java.util.List;
+
+import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.os.Build;
+import android.widget.Button;
+import android.widget.Toast;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements OnClickListener {
+	
+	private Button btnStart, btnPlay;
+	private Boolean recording=false, playing=false;
+	
+	private MediaPlayer mPlayer = null;
+	
+	private DatabaseHandler datasource;
+	
+	private List<SensorData> values;
+	private static final String LOG_TAG = "AudioRecordTest";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		if (savedInstanceState == null) {
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}
+		
+		this.btnStart = (Button)findViewById(R.id.btnStart);
+		this.btnStart.setOnClickListener(this);
+		
+		this.btnPlay = (Button)findViewById(R.id.btnPlay);
+		this.btnPlay.setOnClickListener(this);
+		
+		datasource = new DatabaseHandler(this);
 	}
 
 	@Override
@@ -60,5 +81,51 @@ public class MainActivity extends ActionBarActivity {
 			return rootView;
 		}
 	}
+
+	@Override
+	public void onClick(View v) {
+		Intent intentServiceAudioCapture = new Intent(getApplicationContext(), ServiceAudioRecord.class);
+		if(v.getId()==R.id.btnStart){
+			if(!recording){
+		        getApplicationContext().startService(intentServiceAudioCapture);
+		        btnStart.setText("stop recording");
+		        recording=true;
+			}
+			else{
+				stopService(intentServiceAudioCapture);
+				btnStart.setText("start recording");
+				recording=false;
+			}
+		}
+		if(v.getId()==R.id.btnPlay){
+			if(!playing){
+				startPlaying();
+				btnPlay.setText("stop playback");
+				playing=true;
+			}
+			else{
+				btnPlay.setText("start playback");
+				playing=false;
+			}
+		}
+	}
+	
+	private void startPlaying() {
+		values=datasource.getAllContacts();
+        mPlayer = new MediaPlayer();
+        String filePath = Environment.getExternalStorageDirectory().getPath();
+        String name = values.get(values.size()-1).getAudioFileName();
+        //String name2 = name.substring(name.length()-13);
+        String mFileName = "sdcard/AudioRecorder/" + name;
+        Integer test = values.get(5).getID();
+        Toast.makeText(getApplicationContext(), mFileName, Toast.LENGTH_SHORT).show();
+        try {
+            mPlayer.setDataSource(name);
+            mPlayer.prepare();
+            mPlayer.start();
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "prepare() failed");
+        }
+    }
 
 }
