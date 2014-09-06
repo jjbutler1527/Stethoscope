@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Date;
 
 import android.app.Service;
@@ -34,8 +34,9 @@ public class ServiceAudioRecord extends Service{
 	private boolean isRecording = false;
 	String lat,lon,alt,bea,pr,sp,t;
 	String defaultValue="novalue";
-	String currentYMD_HMS;
+	private String currentYMD_HMS;
 	String afname;
+	Date now = new Date();
 	
 	private long audioLengthSecond = 10;// 10 seconds
 	private Handler rHandler = new Handler();
@@ -79,7 +80,7 @@ public class ServiceAudioRecord extends Service{
 			DatabaseHandler db = new DatabaseHandler(getApplicationContext());
 			SensorData sd= new SensorData();
 			sd.setIsManual("false");
-			sd.setDateAndTime(currentYMD_HMS);
+			sd.setDateAndTime(DateFormat.getInstance().format(now));
 			//sd.setGPSData(lat, lon, alt, pr, sp, bea);
 			Toast.makeText(getBaseContext(), afname, Toast.LENGTH_LONG).show();
 			sd.setAudioFileName(afname);

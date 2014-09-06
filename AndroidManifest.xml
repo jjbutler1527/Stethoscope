@@ -38,6 +38,14 @@
             android:name=".RecordActivity"
             android:label="@string/title_activity_main" >
         </activity>
+        <activity
+            android:name=".HeadSetPlugIntentActivity"
+            android:label="@string/title_activity_head_set_plug_intent" >
+        </activity>
+        <activity
+            android:name=".PreviousRecordingsActivity"
+            android:label="@string/title_activity_previous_recordings" >
+        </activity>
     </application>
 
 </manifest>

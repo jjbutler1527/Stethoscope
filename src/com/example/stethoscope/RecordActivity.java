@@ -18,6 +18,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
+import com.example.stethoscope.R;
 
 public class RecordActivity extends ActionBarActivity implements OnClickListener {
 	
